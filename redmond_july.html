@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雷德蒙德老年人中心 - 2025年7月活动日历</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c5aa0, #1e3a5f);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #ddd;
+            margin: 0;
+        }
+        .day-header {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 15px 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .day {
+            background-color: white;
+            min-height: 120px;
+            padding: 8px;
+            position: relative;
+            border: 1px solid #eee;
+        }
+        .day.other-month {
+            background-color: #f8f9fa;
+            color: #ccc;
+        }
+        .day-number {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .day.other-month .day-number {
+            color: #bbb;
+        }
+        .activity {
+            font-size: 10px;
+            margin: 2px 0;
+            padding: 2px 4px;
+            border-radius: 3px;
+            line-height: 1.2;
+            display: block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .activity:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .activity.free { background-color: #e8f5e8; color: #2d5016; border-left: 3px solid #4caf50; }
+        .activity.paid { background-color: #fff3e0; color: #e65100; border-left: 3px solid #ff9800; }
+        .activity.mahjong { background-color: #e8f5e8; color: #2d5016; border-left: 3px solid #4caf50; font-weight: bold; }
+        .activity.games { background-color: #e3f2fd; color: #0d47a1; border-left: 3px solid #2196f3; }
+        .activity.arts { background-color: #fff3e0; color: #e65100; border-left: 3px solid #ff9800; }
+        .activity.music { background-color: #f3e5f5; color: #4a148c; border-left: 3px solid #9c27b0; }
+        .activity.health { background-color: #ffebee; color: #c62828; border-left: 3px solid #f44336; }
+        .activity.special { background-color: #e8eaf6; color: #283593; border-left: 3px solid #3f51b5; }
+        .activity.concert { background-color: #e8f5e8; color: #2d5016; border-left: 3px solid #4caf50; font-weight: bold; }
+        .activity.lunch { background-color: #fff8e1; color: #f57f17; border-left: 3px solid #ffc107; font-weight: bold; }
+        .price-tag {
+            font-size: 8px;
+            background-color: rgba(255,255,255,0.8);
+            padding: 1px 3px;
+            border-radius: 2px;
+            margin-left: 2px;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        .contact-info {
+            text-align: center;
+            padding: 15px;
+            background-color: #ecf0f1;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+        .close:hover {
+            color: #000;
+        }
+        .modal h2 {
+            margin-top: 0;
+            color: #2c5aa0;
+            border-bottom: 2px solid #2c5aa0;
+            padding-bottom: 10px;
+        }
+        .modal-section {
+            margin: 15px 0;
+        }
+        .modal-section h3 {
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        .price-info {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #2c5aa0;
+        }
+        .location-info {
+            background-color: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        .description {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="header">
+            <h1>雷德蒙德老年人中心活动日历</h1>
+            <p>Redmond Senior & Community Center - 2025年7月（点击活动查看详情）</p>
+        </div>
+        
+        <div class="calendar">
+            <!-- 星期标题 -->
+            <div class="day-header">周日<br>Sunday</div>
+            <div class="day-header">周一<br>Monday</div>
+            <div class="day-header">周二<br>Tuesday</div>
+            <div class="day-header">周三<br>Wednesday</div>
+            <div class="day-header">周四<br>Thursday</div>
+            <div class="day-header">周五<br>Friday</div>
+            <div class="day-header">周六<br>Saturday</div>
+            
+            <!-- 6月29日 -->
+            <div class="day other-month">
+                <div class="day-number">29</div>
+            </div>
+            
+            <!-- 6月30日 -->
+            <div class="day other-month">
+                <div class="day-number">30</div>
+            </div>
+            
+            <!-- 7月1日 -->
+            <div class="day">
+                <div class="day-number">1</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity games" onclick="showModal('needle-arts')">针织艺术 Needle Arts 1pm</div>
+                <div class="activity games" onclick="showModal('german-culture')">德国文化对话 1pm</div>
+                <div class="activity paid" onclick="showModal('line-dancing')">排舞 Line Dancing 5:30pm <span class="price-tag">$15</span></div>
+            </div>
+            
+            <!-- 7月2日 -->
+            <div class="day">
+                <div class="day-number">2</div>
+                <div class="activity games" onclick="showModal('wii-bowling')">Wii保龄球 10:30am</div>
+                <div class="activity games" onclick="showModal('trail-walkers')">步道步行 10am</div>
+                <div class="activity games" onclick="showModal('party-bridge')">派对桥牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity paid" onclick="showModal('tap-fitness')">踢踏健身 6pm <span class="price-tag">$12</span></div>
+            </div>
+            
+            <!-- 7月3日 -->
+            <div class="day">
+                <div class="day-number">3</div>
+                <div class="activity health" onclick="showModal('blood-pressure')">血压检查 11am</div>
+                <div class="activity games" onclick="showModal('quilting')">缝纫小组 9am</div>
+                <div class="activity games" onclick="showModal('pinochle')">皮诺克勒牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity music" onclick="showModal('senior-chorus')">老年人合唱团 1pm</div>
+            </div>
+            
+            <!-- 7月4日 -->
+            <div class="day">
+                <div class="day-number">4</div>
+                <div class="activity arts" onclick="showModal('open-art')">开放艺术工作室 9am</div>
+            </div>
+            
+            <!-- 7月5日 -->
+            <div class="day">
+                <div class="day-number">5</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月6日 -->
+            <div class="day">
+                <div class="day-number">6</div>
+            </div>
+            
+            <!-- 7月7日 -->
+            <div class="day">
+                <div class="day-number">7</div>
+                <div class="activity mahjong" onclick="showModal('mahjong')">🀄 周一麻将 10am</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+                <div class="activity paid" onclick="showModal('driftwood')">漂流木雕塑 10am <span class="price-tag">$10</span></div>
+            </div>
+            
+            <!-- 7月8日 -->
+            <div class="day">
+                <div class="day-number">8</div>
+                <div class="activity games" onclick="showModal('needle-arts')">针织艺术 1pm</div>
+                <div class="activity games" onclick="showModal('trail-walkers')">步道步行 10am</div>
+                <div class="activity games" onclick="showModal('party-bridge')">派对桥牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+            </div>
+            
+            <!-- 7月9日 -->
+            <div class="day">
+                <div class="day-number">9</div>
+                <div class="activity games" onclick="showModal('quilting')">缝纫小组 9am</div>
+                <div class="activity games" onclick="showModal('pinochle')">皮诺克勒牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity music" onclick="showModal('senior-chorus')">老年人合唱团 1pm</div>
+                <div class="activity paid" onclick="showModal('drumming')">节奏鼓乐 11:30am <span class="price-tag">$8</span></div>
+            </div>
+            
+            <!-- 7月10日 -->
+            <div class="day">
+                <div class="day-number">10</div>
+                <div class="activity arts" onclick="showModal('open-art')">开放艺术工作室 9am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity health" onclick="showModal('tech-help')">技术帮助</div>
+            </div>
+            
+            <!-- 7月11日 -->
+            <div class="day">
+                <div class="day-number">11</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+                <div class="activity paid" onclick="showModal('art-history')">艺术史探索 11am <span class="price-tag">$5</span></div>
+            </div>
+            
+            <!-- 7月12日 -->
+            <div class="day">
+                <div class="day-number">12</div>
+            </div>
+            
+            <!-- 7月13日 -->
+            <div class="day">
+                <div class="day-number">13</div>
+            </div>
+            
+            <!-- 7月14日 -->
+            <div class="day">
+                <div class="day-number">14</div>
+                <div class="activity mahjong" onclick="showModal('mahjong')">🀄 周一麻将 10am</div>
+                <div class="activity special" onclick="showModal('reverse-mortgage')">反向抵押贷款讲座 10am</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月15日 -->
+            <div class="day">
+                <div class="day-number">15</div>
+                <div class="activity games" onclick="showModal('trivia')">琐事问答 1pm</div>
+                <div class="activity games" onclick="showModal('needle-arts')">针织艺术 1pm</div>
+                <div class="activity games" onclick="showModal('trail-walkers')">步道步行 10am</div>
+                <div class="activity games" onclick="showModal('party-bridge')">派对桥牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+            </div>
+            
+            <!-- 7月16日 -->
+            <div class="day">
+                <div class="day-number">16</div>
+                <div class="activity games" onclick="showModal('quilting')">缝纫小组 9am</div>
+                <div class="activity games" onclick="showModal('pinochle')">皮诺克勒牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity music" onclick="showModal('senior-chorus')">老年人合唱团 1pm</div>
+                <div class="activity paid" onclick="showModal('floral-arranging')">花艺设计 5:30pm <span class="price-tag">$19</span></div>
+            </div>
+            
+            <!-- 7月17日 -->
+            <div class="day">
+                <div class="day-number">17</div>
+                <div class="activity health" onclick="showModal('elap')">东区法律援助 11am</div>
+                <div class="activity arts" onclick="showModal('open-art')">开放艺术工作室 9am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+            </div>
+            
+            <!-- 7月18日 -->
+            <div class="day">
+                <div class="day-number">18</div>
+                <div class="activity games" onclick="showModal('paper-crafts')">纸艺制作 10am</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月19日 -->
+            <div class="day">
+                <div class="day-number">19</div>
+                <div class="activity paid" onclick="showModal('amigurumi')">阿米古鲁米钩编 10am <span class="price-tag">$9</span></div>
+            </div>
+            
+            <!-- 7月20日 -->
+            <div class="day">
+                <div class="day-number">20</div>
+            </div>
+            
+            <!-- 7月21日 -->
+            <div class="day">
+                <div class="day-number">21</div>
+                <div class="activity mahjong" onclick="showModal('mahjong')">🀄 周一麻将 10am</div>
+                <div class="activity special" onclick="showModal('property-tax')">房产税减免讲座 10am</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月22日 -->
+            <div class="day">
+                <div class="day-number">22</div>
+                <div class="activity games" onclick="showModal('get-to-know')">认识你小组 1pm</div>
+                <div class="activity games" onclick="showModal('needle-arts')">针织艺术 1pm</div>
+                <div class="activity games" onclick="showModal('trail-walkers')">步道步行 10am</div>
+                <div class="activity games" onclick="showModal('party-bridge')">派对桥牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity paid" onclick="showModal('artfully-made')">艺术制作 10am <span class="price-tag">$10</span></div>
+            </div>
+            
+            <!-- 7月23日 -->
+            <div class="day">
+                <div class="day-number">23</div>
+                <div class="activity games" onclick="showModal('quilting')">缝纫小组 9am</div>
+                <div class="activity games" onclick="showModal('pinochle')">皮诺克勒牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity music" onclick="showModal('senior-chorus')">老年人合唱团 1pm</div>
+            </div>
+            
+            <!-- 7月24日 -->
+            <div class="day">
+                <div class="day-number">24</div>
+                <div class="activity arts" onclick="showModal('open-art')">开放艺术工作室 9am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity health" onclick="showModal('tech-help')">技术帮助</div>
+                <div class="activity games" onclick="showModal('game-group')">游戏小组 1pm</div>
+            </div>
+            
+            <!-- 7月25日 -->
+            <div class="day">
+                <div class="day-number">25</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月26日 -->
+            <div class="day">
+                <div class="day-number">26</div>
+            </div>
+            
+            <!-- 7月27日 -->
+            <div class="day">
+                <div class="day-number">27</div>
+            </div>
+            
+            <!-- 7月28日 -->
+            <div class="day">
+                <div class="day-number">28</div>
+                <div class="activity mahjong" onclick="showModal('mahjong')">🀄 周一麻将 10am</div>
+                <div class="activity games" onclick="showModal('bingo')">宾果游戏 10am</div>
+                <div class="activity games" onclick="showModal('mexican-train')">墨西哥火车多米诺 12:30pm</div>
+            </div>
+            
+            <!-- 7月29日 -->
+            <div class="day">
+                <div class="day-number">29</div>
+                <div class="activity games" onclick="showModal('needle-arts')">针织艺术 1pm</div>
+                <div class="activity games" onclick="showModal('trail-walkers')">步道步行 10am</div>
+                <div class="activity games" onclick="showModal('party-bridge')">派对桥牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+            </div>
+            
+            <!-- 7月30日 -->
+            <div class="day">
+                <div class="day-number">30</div>
+                <div class="activity concert" onclick="showModal('rockin-river')">🎸 河边摇滚音乐会 5:30pm</div>
+                <div class="activity concert" onclick="showModal('rockin-river')">Stonesy 滚石致敬</div>
+                <div class="activity games" onclick="showModal('quilting')">缝纫小组 9am</div>
+                <div class="activity games" onclick="showModal('pinochle')">皮诺克勒牌 10am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+                <div class="activity music" onclick="showModal('senior-chorus')">老年人合唱团 1pm</div>
+            </div>
+            
+            <!-- 7月31日 -->
+            <div class="day">
+                <div class="day-number">31</div>
+                <div class="activity arts" onclick="showModal('open-art')">开放艺术工作室 9am</div>
+                <div class="activity lunch" onclick="showModal('senior-lunch')">🍽️ 老年人午餐 12pm <span class="price-tag">$4.5</span></div>
+            </div>
+            
+            <!-- 8月1日 -->
+            <div class="day other-month">
+                <div class="day-number">1</div>
+            </div>
+            
+            <!-- 8月2日 -->
+            <div class="day other-month">
+                <div class="day-number">2</div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e8f5e8; border-left: 3px solid #4caf50;"></div>
+                <span>💚 免费活动 Free</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #fff3e0; border-left: 3px solid #ff9800;"></div>
+                <span>💰 收费活动($20以下) Paid</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #fff8e1; border-left: 3px solid #ffc107;"></div>
+                <span>🍽️ 老年人午餐 Senior Lunch</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e8f5e8; border-left: 3px solid #4caf50; font-weight: bold;"></div>
+                <span>🀄 麻将活动 Mahjong (推荐)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e8f5e8; border-left: 3px solid #4caf50;"></div>
+                <span>🎪 特别活动 Special Events</span>
+            </div>
+        </div>
+        
+        <div class="contact-info">
+            <strong>注册方式 Registration:</strong> 在线 Online: redmond.gov/Activities | 电话 Phone: 425-556-2300<br>
+            <strong>地址 Address:</strong> 8703 160th Ave NE, Redmond, WA 98052 | <strong>网站 Website:</strong> redmond.gov/Seniors
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalContent">
+                <!-- 动态内容将在这里显示 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 活动详细信息数据
+        const activityDetails = {
+            'mahjong': {
+                title: '🀄 周一麻将 Mahjong Mondays',
+                time: '每周一上午10:00 - 12:00',
+                location: 'Senior Library',
+                price: '免费 Free',
+                description: '这是最适合中国父母的活动！欢迎所有经验水平的参与者。我们提供所有麻将材料和基础指导。这是一个很好的社交机会，可以认识其他华人朋友。语言障碍最小，非常推荐！',
+                registration: '需要注册以帮助规划参与人数',
+                special: '⭐ 特别推荐给中国父母'
+            },
+            'needle-arts': {
+                title: '针织艺术 Needle Arts',
+                time: '周二下午1:00',
+                location: 'Room 142',
+                price: '免费 Free',
+                description: '学习各种针织技巧，包括编织、钩针等。适合所有水平的参与者，从初学者到有经验的针织爱好者都欢迎。',
+                registration: '需要注册'
+            },
+            'german-culture': {
+                title: '德国文化与对话 German Culture and Conversation',
+                time: '每月第三个周二下午1:00',
+                location: 'Room 144',
+                price: '免费 Free',
+                description: '了解德国文化，练习德语对话。适合对德国文化感兴趣或想练习德语的参与者。',
+                registration: '需要注册'
+            },
+            'line-dancing': {
+                title: '排舞 Line Dancing with Evamarie',
+                time: '周一下午5:30 - 6:30（入门班）',
+                location: 'Red Oak Community Room',
+                price: '$15 临时付费 (Drop-in)',
+                description: '学习基础排舞步法，跟随有趣易学的舞蹈动作。您将伴随各种音乐起舞 - 从流行到爵士，摇滚到R&B，乡村到拉丁音乐。Evamarie是一位才华横溢、有趣且富有感染力的教练！',
+                registration: '可临时付费参加'
+            },
+            'wii-bowling': {
+                title: 'Wii保龄球 Wii Bowling',
+                time: '周二上午10:30',
+                location: 'Senior Lounge',
+                price: '免费 Free',
+                description: '使用Wii游戏机进行虚拟保龄球游戏。这是一个有趣的社交活动，适合所有年龄段。无需真实保龄球经验。',
+                registration: '需要注册'
+            },
+            'trail-walkers': {
+                title: '步道步行者和轻松步行者 Trail Walkers and Easy Pacers',
+                time: '周二上午10:00',
+                location: '在Senior Lounge集合',
+                price: '免费 Free',
+                description: '加入我们的户外步行小组！适合各种健身水平的参与者。我们会选择适合的步行路线，享受新鲜空气和友好的陪伴。',
+                registration: '需要注册'
+            },
+            'party-bridge': {
+                title: '派对桥牌 Party Bridge',
+                time: '周二上午10:00',
+                location: 'Room 134',
+                price: '免费 Free',
+                description: '参加经典的桥牌游戏。这是智力、策略和友好竞争的完美结合。欢迎各种水平的玩家。',
+                registration: '需要注册'
+            },
+            'tap-fitness': {
+                title: '踢踏健身 Tap Fitness Wednesday',
+                time: '周三下午6:00 - 7:15',
+                location: 'Old Redmond Schoolhouse',
+                price: '$12 (居民) $12 (非居民)',
+                description: '准备好有趣的健身方式？踢踏健身将简单的踢踏舞步与优美音乐结合，进行绝佳的有氧运动。',
+                registration: '需要注册'
+            },
+            'blood-pressure': {
+                title: '血压检查 Blood Pressure Checks',
+                time: '每月第一个周三上午11:00 - 12:00',
+                location: 'Senior Lounge',
+                price: '免费 Free',
+                description: '免费血压检查服务。由专业医护人员提供，帮助您监控健康状况。',
+                registration: '无需注册'
+            },
+            'quilting': {
+                title: '缝纫小组 Quilting Group',
+                time: '周三上午9:00 - 12:00',
+                location: 'Room 142',
+                price: '免费 Free',
+                description: '学习缝纫和拼布技巧。这是一个社交和创意的活动，可以制作美丽的手工艺品。',
+                registration: '需要注册'
+            },
+            'pinochle': {
+                title: '皮诺克勒牌 Pinochle',
+                time: '周三上午10:00 - 下午3:00',
+                location: 'Senior Library',
+                price: '免费 Free',
+                description: '学习和游戏经典的皮诺克勒纸牌游戏。这是一个很好的智力游戏，有助于保持思维敏捷。',
+                registration: '需要注册'
+            },
+            'senior-chorus': {
+                title: '老年人合唱团 Senior Chorus',
+                time: '周三下午1:00 - 3:00',
+                location: 'Room 134',
+                price: '免费 Free',
+                description: '加入我们的合唱团！音乐无国界，这是一个很好的社交和艺术表达机会。欢迎所有声音和经验水平。',
+                registration: '需要注册'
+            },
+            'open-art': {
+                title: '开放艺术工作室 Open Art Studio',
+                time: '周四上午9:00 - 下午1:00',
+                location: 'Room 142',
+                price: '免费 Free',
+                description: '自由创作的艺术空间！带上您的艺术项目或使用我们提供的材料进行创作。绘画、素描、手工艺都欢迎。',
+                registration: '需要注册'
+            },
+            'mexican-train': {
+                title: '墨西哥火车多米诺 Mexican Train Dominoes',
+                time: '多个时间段（周一/周二/周五 下午12:30）',
+                location: 'Room 144',
+                price: '免费 Free',
+                description: '学习这个有趣的多米诺骨牌游戏。规则简单易学，非常适合社交娱乐。',
+                registration: '需要注册'
+            },
+            'driftwood': {
+                title: '漂流木雕塑 Beginning Driftwood Sculpture',
+                time: '周一上午10:00 - 12:00 或 下午1:00 - 3:00',
+                location: 'Room 142',
+                price: '$10 临时付费 (Drop-in)',
+                description: '适合新手或经验很少的人。课堂提供基础工具套装和漂流木。主要靠动手操作，语言要求较低，非常适合中国父母参与。',
+                registration: '可按月付费或临时付费'
+            },
+            'drumming': {
+                title: '探索节奏与鼓乐 Exploring Rhythms and Drumming',
+                time: '周三上午11:30 - 下午12:30',
+                location: 'Room 134',
+                price: '$8 (7月9-30日)',
+                description: '探索手鼓的节奏和益处。课堂提供鼓或可自带。无需音乐经验，适合所有水平。',
+                registration: '需要注册'
+            },
+            'tech-help': {
+                title: '技术帮助 Tech Help',
+                time: '每月第二和第四个周四',
+                location: 'Senior Lounge',
+                price: '免费 Free',
+                description: '30分钟的个人技术协助。帮助解决手机、电脑、平板等设备使用问题。',
+                registration: '需在线预约30分钟时段'
+            },
+            'art-history': {
+                title: '艺术史探索 Exploring Art History',
+                time: '7月11日上午11:00 - 12:30 & 8月8日',
+                location: 'Room 142',
+                price: '$5 每次',
+                description: '7月11日：探索艺术家Renee Fly的图案。8月8日：探索艺术家Joan Miro的形状插画。学习艺术家并创作项目。提供所有材料，无需艺术经验。',
+                registration: '需要注册'
+            },
+            'reverse-mortgage': {
+                title: '反向抵押贷款：您需要了解的 Reverse Mortgages',
+                time: '7月14日周一上午10:00 - 11:30',
+                location: 'Room 140',
+                price: '免费 Free',
+                description: '了解反向抵押贷款的工作原理，如何降低成本和改善现金流。准备好提问！',
+                registration: '需要注册'
+            },
+            'trivia': {
+                title: '周二琐事问答 Trivia Tuesday',
+                time: '每月第一个周二下午1:00',
+                location: 'Senior Lounge',
+                price: '免费 Free',
+                description: '有趣的琐事问答游戏，测试您的知识面，与朋友一起享受智力挑战。',
+                registration: '需要注册'
+            },
+            'floral-arranging': {
+                title: '林恩花艺设计 Floral Arranging with Lynn',
+                time: '7月16日下午5:30 - 7:30',
+                location: 'Room 140',
+                price: '$19 (居民) $23 (非居民)',
+                description: '海滨中心装饰：以茂盛的蓝色绣球花、精致的飞燕草、柔和的奶油玫瑰和白色百合为特色，捕捉海岸美景的精髓。从专业人士学习花艺设计艺术！',
+                registration: '需要注册'
+            },
+            'elap': {
+                title: '东区法律援助 ELAP (Eastside Legal Assistance)',
+                time: '每月第三个周三上午11:00 - 12:00',
+                location: '现场服务',
+                price: '免费 Free',
+                description: '提供免费民事（非刑事）法律服务，为无法负担律师费用的人提供帮助。',
+                registration: '需在线注册15分钟咨询预约'
+            },
+            'paper-crafts': {
+                title: '纸艺和卡片制作 Paper Crafts and Card Making',
+                time: '每月第三个周五上午10:00 - 12:00',
+                location: 'Lounge',
+                price: '免费 Free',
+                description: '学习制作美丽的手工卡片和纸艺作品。适合各种技能水平，是很好的创意活动。',
+                registration: '需要注册'
+            },
+            'amigurumi': {
+                title: '阿米古鲁米钩编入门 Intro to Amigurumi Crochet',
+                time: '7月19日上午10:00 - 12:30',
+                location: 'Room 142',
+                price: '$9 (居民) $11 (非居民)',
+                description: '通过阿米古鲁米学习钩编艺术！如果您是钩编新手，将学习所有基础知识，同时创作可爱的角色和动物。提供所有材料，欢迎所有经验水平！',
+                registration: '需要注册'
+            },
+            'property-tax': {
+                title: '华盛顿州老年人房产税减免 WA Property Tax Exemptions',
+                time: '7月21日周一上午10:00 - 11:30',
+                location: 'Room 134',
+                price: '免费 Free',
+                description: '金县评估师将在这里解释老年人减免项目的工作原理以及您如何能够节省房产税。',
+                registration: '需要注册'
+            },
+            'get-to-know': {
+                title: '认识你小组 Get To Know You Group',
+                time: '每月第二个周二下午1:00',
+                location: 'Senior Lounge',
+                price: '免费 Free',
+                description: '社交活动，帮助新成员认识其他参与者，建立友谊。（夏季休息）',
+                registration: '需要注册'
+            },
+            'artfully-made': {
+                title: '艺术制作 Artfully Made',
+                time: '7月22日上午10:00 - 11:30',
+                location: 'Room 142',
+                price: '$10 (居民) $12 (非居民)',
+                description: '7月22日项目：风干粘土插画。学习技巧和基础艺术概念，从头到尾制作项目。提供所有材料。',
+                registration: '需要注册'
+            },
+            'game-group': {
+                title: '游戏小组 Game Group',
+                time: '每月第四个周四下午1:00 - 2:30',
+                location: 'Room 144',
+                price: '免费 Free',
+                description: '各种棋牌游戏和桌面游戏。适合喜欢游戏和社交的参与者。',
+                registration: '需要注册'
+            },
+            'bingo': {
+                title: '宾果游戏 Bingo!',
+                time: '每月第四个周一上午10:00',
+                location: 'Room 144',
+                price: '免费 Free',
+                description: '经典的宾果游戏！有奖品，充满乐趣的社交活动。',
+                registration: '需要注册'
+            },
+            'rockin-river': {
+                title: '🎸 河边摇滚免费音乐会 Rockin\' on the River',
+                time: '7月30日下午5:30开始',
+                location: 'Great Lawn (Redmond City Hall和Senior Center之间)',
+                price: '完全免费 Completely Free',
+                description: '7月30日：Stonesy - 滚石乐队致敬乐队。这是太平洋西北地区首屈一指的西雅图乐队，忠实再现滚石乐队的永恒音乐。带上毯子、折叠椅、家人和朋友来享受夏日音乐！',
+                registration: '无需注册，自由参加',
+                special: '🌟 强烈推荐的免费户外音乐会！'
+            },
+            'senior-lunch': {
+                title: '🍽️ 老年人午餐 Senior Lunch',
+                time: '周二、周三、周四 中午12:00',
+                location: 'Red Oak Community Room at Redmond Senior & Community Center',
+                price: '$4.50 建议捐款 (门口支付)',
+                description: '为50岁以上成人提供营养丰富的午餐。午餐数量提前订购，主要基于当前报名人数。需要提前注册以保证有午餐。少数现场报名者如有座位通常会被接纳（但不保证）。',
+                registration: '必须提前注册以保证午餐',
+                special: '🥘 营养丰富，社交用餐的好机会！',
+                schedule: '时间安排：上午11:30为预注册参与者开门入座。如有座位，现场报名者将在上午11:55入座。所有参与者必须在中午前签到并入座。午餐准时12点开始供应。'
+            }
+        };
+
+        function showModal(activityId) {
+            const modal = document.getElementById('activityModal');
+            const modalContent = document.getElementById('modalContent');
+            const activity = activityDetails[activityId];
+            
+            if (activity) {
+                let html = `
+                    <h2>${activity.title}</h2>
+                    
+                    <div class="modal-section">
+                        <h3>⏰ 时间 Time</h3>
+                        <p>${activity.time}</p>
+                    </div>
+                    
+                    <div class="modal-section location-info">
+                        <h3>📍 地点 Location</h3>
+                        <p>${activity.location}</p>
+                    </div>
+                    
+                    <div class="modal-section price-info">
+                        <h3>💰 费用 Price</h3>
+                        <p>${activity.price}</p>
+                    </div>
+                    
+                    <div class="modal-section description">
+                        <h3>📝 活动描述 Description</h3>
+                        <p>${activity.description}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>📋 注册信息 Registration</h3>
+                        <p>${activity.registration}</p>
+                    </div>
+                `;
+                
+                if (activity.schedule) {
+                    html += `
+                        <div class="modal-section" style="background-color: #e8f4fd; padding: 10px; border-radius: 5px; border-left: 4px solid #2196f3;">
+                            <h3>⏰ 详细时间安排 Schedule Details</h3>
+                            <p>${activity.schedule}</p>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="modal-section" style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+                        <p><strong>注册方式 Registration Methods:</strong></p>
+                        <p>🌐 在线 Online: <a href="https://redmond.gov/Activities" target="_blank">redmond.gov/Activities</a></p>
+                        <p>📞 电话 Phone: <a href="tel:425-556-2300">425-556-2300</a></p>
+                        <p>🏢 现场 In Person: 任何Redmond community center或City Hall</p>
+                    </div>
+                `;
+                
+                modalContent.innerHTML = html;
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('activityModal').style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('activityModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
