@@ -7,8 +7,9 @@
     <style>
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
-            margin: 20px;
+            margin: 10px;
             background-color: #f5f5f5;
+            min-width: 320px;
         }
         .calendar-container {
             max-width: 1200px;
@@ -17,6 +18,18 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             overflow: hidden;
+        }
+        
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            body {
+                margin: 5px;
+            }
+            .calendar-container {
+                border-radius: 5px;
+                overflow-x: auto;
+                min-width: 100%;
+            }
         }
         .header {
             background: linear-gradient(135deg, #2c5aa0, #1e3a5f);
@@ -33,12 +46,27 @@
             font-size: 14px;
             opacity: 0.9;
         }
+        
+        /* 手机端标题适配 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 10px;
+            }
+            .header h1 {
+                font-size: 20px;
+                line-height: 1.2;
+            }
+            .header p {
+                font-size: 12px;
+            }
+        }
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
             background-color: #ddd;
             margin: 0;
+            min-width: 700px; /* 确保日历最小宽度 */
         }
         .day-header {
             background-color: #34495e;
@@ -47,6 +75,7 @@
             padding: 15px 5px;
             font-weight: bold;
             font-size: 14px;
+            min-width: 90px;
         }
         .day {
             background-color: white;
@@ -54,6 +83,40 @@
             padding: 8px;
             position: relative;
             border: 1px solid #eee;
+            min-width: 90px;
+        }
+        
+        /* 手机端日历适配 */
+        @media (max-width: 768px) {
+            .calendar {
+                min-width: 700px; /* 保持固定宽度，允许水平滚动 */
+            }
+            .day-header {
+                padding: 10px 3px;
+                font-size: 12px;
+                min-width: 85px;
+            }
+            .day {
+                min-height: 100px;
+                padding: 6px;
+                min-width: 85px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .calendar {
+                min-width: 600px;
+            }
+            .day-header {
+                padding: 8px 2px;
+                font-size: 11px;
+                min-width: 75px;
+            }
+            .day {
+                min-height: 90px;
+                padding: 4px;
+                min-width: 75px;
+            }
         }
         .day.other-month {
             background-color: #f8f9fa;
@@ -77,10 +140,32 @@
             display: block;
             cursor: pointer;
             transition: all 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .activity:hover {
             transform: scale(1.05);
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* 手机端活动文字适配 */
+        @media (max-width: 768px) {
+            .activity {
+                font-size: 9px;
+                padding: 1px 3px;
+                margin: 1px 0;
+                line-height: 1.1;
+            }
+            .activity:hover {
+                transform: none; /* 移除手机端的hover效果 */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .activity {
+                font-size: 8px;
+                padding: 1px 2px;
+            }
         }
         .activity.free { background-color: #e8f5e8; color: #2d5016; border-left: 3px solid #4caf50; }
         .activity.paid { background-color: #fff3e0; color: #e65100; border-left: 3px solid #ff9800; }
@@ -107,12 +192,38 @@
             padding: 15px;
             background-color: #f8f9fa;
             border-top: 1px solid #ddd;
+            overflow-x: auto;
         }
         .legend-item {
             display: flex;
             align-items: center;
             gap: 5px;
             font-size: 12px;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+        
+        /* 手机端图例适配 */
+        @media (max-width: 768px) {
+            .legend {
+                gap: 10px;
+                padding: 10px;
+                justify-content: flex-start;
+            }
+            .legend-item {
+                font-size: 11px;
+                gap: 4px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .legend {
+                gap: 8px;
+                padding: 8px;
+            }
+            .legend-item {
+                font-size: 10px;
+            }
         }
         .legend-color {
             width: 12px;
@@ -125,6 +236,16 @@
             background-color: #ecf0f1;
             font-size: 12px;
             color: #7f8c8d;
+            word-wrap: break-word;
+        }
+        
+        /* 手机端联系信息适配 */
+        @media (max-width: 768px) {
+            .contact-info {
+                padding: 10px;
+                font-size: 11px;
+                line-height: 1.4;
+            }
         }
         
         /* 模态框样式 */
@@ -137,6 +258,8 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            box-sizing: border-box;
         }
         .modal-content {
             background-color: white;
@@ -148,6 +271,28 @@
             max-height: 80vh;
             overflow-y: auto;
             position: relative;
+        }
+        
+        /* 手机端模态框适配 */
+        @media (max-width: 768px) {
+            .modal {
+                padding: 5px;
+            }
+            .modal-content {
+                margin: 2% auto;
+                padding: 15px;
+                width: 95%;
+                max-height: 90vh;
+                border-radius: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 12px;
+                width: 98%;
+                margin: 1% auto;
+            }
         }
         .close {
             color: #aaa;
